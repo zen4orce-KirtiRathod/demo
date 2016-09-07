@@ -1,0 +1,81 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+    <apex:includeScript value="{!URLFOR($Resource.ConfigCleanUpJS, 'files/js/jquery.min.js')}"/>
+    <apex:includescript value="{!URLFOR($Resource.ConfigCleanUpJS, 'files/js/bootstrap.min.js')}" / >
+	<apex:includescript value="{!URLFOR($Resource.ConfigCleanUpJS, 'files/js/jquery.dataTables.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.ConfigCleanUpJS, 'files/js/toastr.js')}" />
+	<apex:stylesheet value="{!URLFOR($Resource.ConfigCleanUpJS, 'files/css/jquery.dataTables.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.ConfigCleanUpJS, 'files/css/bootstrap-theme.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.ConfigCleanUpJS, 'files/css/bootstrap.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.ConfigCleanUpJS, 'files/css/toastr.css')}" />    
+    <apex:stylesheet value="{!URLFOR($Resource.ConfigCleanUpJS, 'files/css/custom.css')}" />
+	
+        <div class="container demo">
+
+	
+	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+		<div class="panel panel-default">
+			<div class="panel-heading" role="tab" id="headingOne">
+				<h4 class="panel-title">
+					<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+						<i class="more-less glyphicon glyphicon-plus"></i>
+						Triggers
+					</a>
+				</h4>
+			</div>
+			<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+				<div class="panel-body">
+					 <c:datatablegroup typeofConfig="Trigger" header1="Object" header2="Triggers" header3="Selected Triggers" icon1="glyphicon glyphicon-wrench"/>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading" role="tab" id="headingTwo">
+				<h4 class="panel-title">
+					<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+						<i class="more-less glyphicon glyphicon-plus"></i>
+						Apex Pages
+					</a>
+				</h4>
+			</div>
+			<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+				<div class="panel-body">
+					  <c:datatableSingle typeofConfig="ApexPage" header1="Apex Pages" header2="Selected Apex Pages" icon1="glyphicon glyphicon-list" />
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading" role="tab" id="headingThree">
+				<h4 class="panel-title">
+					<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+						<i class="more-less glyphicon glyphicon-plus"></i>
+						Workflows
+					</a>
+				</h4>
+			</div>
+			<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+				<div class="panel-body">
+                    <c:datatablegroup typeofConfig="WorkflowRules" header1="Object" header2="Workflow Rules" header3="Selected Workflow Rules" icon1="glyphicon glyphicon-wrench" />
+				</div>
+			</div>
+		</div>
+        <div class="panel panel-default">
+			<div class="panel-heading" role="tab" id="headingFour">
+				<h4 class="panel-title">
+					<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+						<i class="more-less glyphicon glyphicon-plus"></i>
+						Custom Fields
+					</a>
+				</h4>
+			</div>
+			<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+				<div class="panel-body">
+                    <c:datatablegroup typeofConfig="CustomFields" header1="Object" header2="Custom Fields" header3="Selected Custom Fields" icon1="glyphicon glyphicon-wrench" />
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</apex:page>

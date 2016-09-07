@@ -1,0 +1,13 @@
+<apex:page controller="TestParamController">
+<apex:form >
+    <apex:pageBlock mode="edit" id="block">
+        <apex:pageBlockSection >
+        <apex:pageBlockSectionItem >
+            <apex:commandButton value="Go!" action="{!passParam}"  rerender="block" >                
+                <apex:param name="eventId" value="{!inputValue}" assignTo="{!paramValue}"/>
+            </apex:commandButton>                
+        </apex:pageBlockSectionItem>
+      </apex:pageBlockSection>
+   </apex:pageBlock>    
+</apex:form>
+ </apex:page>

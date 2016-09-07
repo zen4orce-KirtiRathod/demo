@@ -1,0 +1,27 @@
+<apex:page showHeader="false" sidebar="false"> 
+    <!--<apex:includeScript value="{!$Resource.jQueryPlugin}"/>
+    <apex:includeScript value="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.js"></apex:includeScript>
+    <apex:stylesheet value="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"></apex:stylesheet>
+  -->
+    <apex:stylesheet value="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"></apex:stylesheet>
+    <apex:includeScript value="https://code.jquery.com/jquery-1.12.4.js"></apex:includeScript>
+    <apex:includeScript value="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></apex:includeScript>
+<div id="myDialog">
+    This is the content of my modal dialog box
+</div>
+
+<button id="clickMe">Click Me</button>
+    <script>
+        var j$=jQuery.noConflict();
+    	j$(document).ready(function(){
+          j$("#myDialog").dialog({
+    autoOpen  : false,
+    modal     : true
+});
+j$('#clickMe').click(function() {
+    j$("#myDialog").dialog("open");
+});
+        });
+    	
+     </script>
+</apex:page>

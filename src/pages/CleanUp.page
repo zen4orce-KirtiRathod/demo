@@ -1,0 +1,152 @@
+<apex:page controller="DataCleanUp" showHeader="false" sidebar="false"> 
+     <apex:stylesheet value="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"></apex:stylesheet>
+    <apex:includeScript value="https://code.jquery.com/jquery-1.12.4.js"></apex:includeScript>
+    <apex:includeScript value="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></apex:includeScript>
+    <script>
+      var j$=jQuery.noConflict();
+    	j$(document).ready(function(){
+          j$("#myDialog").dialog({
+             autoOpen  : false,
+             modal     : true,
+             closeText:""
+		});
+        
+        j$("#dependancyCheck").dialog({
+             autoOpen  : false,
+             modal     : true,
+             closeText: "",
+             buttons : [{
+                  text: "Confirm",
+                  click: function() {
+                     deleteRecords();
+                  },
+                 style : "position: absolute; left:20px;"
+               },
+               {
+                  text: "Cancel",
+                  click: function() {                      
+                      j$(this).dialog("close");
+                  }
+               }]
+		});
+        j$("#NoData").dialog({
+        	autoOpen : false,
+            modal    : true,
+            closeText : "",
+            buttons : [{
+                  text: "Confirm",
+                  click: function() {
+                      j$(this).dialog("close");
+                  },
+                 style : "position: absolute; left:20px;",
+                 click : function(){
+            	deleteRecords();
+            }
+               },
+               {
+                  text: "Cancel",
+                  click: function() {                      
+                      j$(this).dialog("close");
+                  }
+               }]
+            });
+           
+    });
+    function showCount(count)
+      {
+          debugger;
+          console.log(count);
+          j$("#recordCount").text(count);
+      	  j$("#myDialog").dialog("open");
+          
+      }
+    function showDependency(dependentList)
+    { 
+        if(dependentList.length > 2)
+        {
+            j$("#dependentObjects").text(dependentList);
+        	j$("#dependancyCheck").dialog("open");
+		}
+         else
+         {
+             
+             j$("#NoRecordData").text();
+             j$("#NoData").dialog("open");
+         }
+                
+       
+    }
+     </script>
+  <apex:form >
+         <apex:outputPanel id="hiddenblock">
+			<apex:pagemessages /> 
+		</apex:outputPanel>
+         <apex:actionFunction action="{!checkAllStd}" name="checkStd" reRender="standardTable"/>
+           <apex:actionFunction action="{!checkAllCustom}" name="checkCus" reRender="customTable"/>  
+      		<apex:actionFunction action="{!deleteRecords}" name="deleteRecords" />
+           <apex:actionFunction action="{!QueryCount}" name="countObj"  oncomplete="return showCount('{!count}');" reRender="example">
+                <apex:param name="objCount" value="" id="RecordsCount" assignTo="{!objName}"/>
+           </apex:actionFunction>
+           <apex:pageBlock title="Standard Data Clean Up" >
+               <apex:pageBlockSection id="pageId" title="Standard Objects" columns="4" collapsible="true">
+                   <apex:pageBlockTable value="{!standardWrapObjList}" var="wObj"  id="standardTable" align="center" title="Standard Objects" styleClass="table">
+                       <apex:column >
+                           <apex:facet name="header" ><apex:inputCheckbox onclick="checkStd()" value="{!standardFlag}"/></apex:facet>
+                           <apex:inputCheckbox value="{!wObj.isSelected}" id="InputId" label="Object Name"/> 
+                       </apex:column>
+                       <apex:column > 
+                           <apex:facet name="header" >Object Name</apex:facet> 
+                           {!wObj.objName} 
+                       </apex:column>
+                       <apex:column > 
+                           <apex:facet name="header" >Number of Records</apex:facet> 
+                           <apex:outputLink onclick="countObj('{!wObj.objName}');return false; " >
+                               See Number of Records
+                           </apex:outputLink>
+                           </apex:column>
+                     </apex:pageBlockTable>
+               </apex:pageBlockSection>
+               <apex:pageBlockButtons >
+                <apex:commandButton value="Delete"  action="{!dependentStdtObjList}"  reRender="hiddenblock"  oncomplete="return showDependency('{!depenStdList}');"/>
+                <apex:commandButton action="{!cancleStandardDelete}" value="Cancel" reRender="pageId"/>
+                 
+               </apex:pageBlockButtons>
+         </apex:pageBlock>
+         <apex:pageBlock title="Custom Data Clean Up" >
+             <apex:pageBlockSection id="pageId" title="Custom Objects" columns="4" collapsible="true">
+                 <apex:pageBlockTable value="{!customWrapObjList}" var="wObj"  id="customTable" align="center" title="Custom Objects" styleClass="table" >
+                     <apex:column >
+                        <apex:facet name="header" ><apex:inputCheckbox onclick="checkCus()" value="{!customFlag}"/></apex:facet> 
+                         <apex:inputCheckbox value="{!wObj.isSelected}" id="InputId" label="Object Name"/> 
+                     </apex:column>
+                     <apex:column > 
+                         <apex:facet name="header" >Object Name</apex:facet> 
+                           {!wObj.objName} 
+                     </apex:column>
+                     <apex:column > 
+                         <apex:facet name="header" >Number of Records</apex:facet> 
+                         <apex:outputLink onclick="countObj('{!wObj.objName};return false;')">
+                               See Number of Records
+                         </apex:outputLink>
+                     </apex:column>
+                 </apex:pageBlockTable> 
+             </apex:pageBlockSection>
+             <apex:pageBlockButtons >
+                <apex:commandButton value="Delete"  action="{!dependentCustObjList}"  reRender="pageId"  oncomplete="return showDependency('{!depenCustomList}')"/>
+                <apex:commandButton action="{!cancleCustomDelete}" value="Cancel" reRender="pageId"/>
+            </apex:pageBlockButtons>
+         </apex:pageBlock>
+        
+         <apex:pageBlock id="example"></apex:pageBlock>
+    </apex:form>
+     <div id="myDialog" title = "See Number of Records">
+         <div>Number of Records - <span id="recordCount"></span></div>
+	</div>
+    <div id="NoData" title = "Dependency Check">
+         <div>Their is no dependency ..You can safely delete Records - <span id="NoRecordData"></span></div>
+	</div>
+    <div id = "dependancyCheck" title = "Dependency Check">
+        <div>
+            Your attempt to delete  could not be completed because it is associated with the following objects. If you want to delete records you have to delete these objects records also.-<span id = "dependentObjects"></span></div>
+        </div>    
+</apex:page>

@@ -1,0 +1,276 @@
+<apex:component Controller="ConfigurationCleanUpService1">
+     <apex:attribute name="typeofConfig" description="sample" type="String" required="true"/>
+    <apex:form >
+ 	<head> 
+		<script>
+			j$ = jQuery.noConflict();
+              toastr.options = {
+  				"closeButton": false,
+  				"debug": false,
+  				"newestOnTop": false,
+  				"progressBar": false,
+  				"positionClass": "toast-top-right",
+  				"preventDuplicates": false,
+  				"onclick": null,
+  				"showDuration": "300",
+  				"hideDuration": "1000",
+  				"timeOut": "5000",
+  				"extendedTimeOut": "1000",
+  				"showEasing": "swing",
+  				"hideEasing": "linear",
+  				"showMethod": "fadeIn",
+  				"hideMethod": "fadeOut"
+			}; 
+          debugger;
+            var triggerJsonData = {!triggersJson};
+        var {!typeofConfig}PreviewTable;//triggerPreviewTable
+        var {!typeofConfig}SelectedTable;//selectedTriggersTable
+        var {!typeofConfig}ObjTable;//triggerObjTable
+        var {!typeofConfig}ObjectData = [];//triggersObjectData
+        var {!typeofConfig}Data = [];//triggersData
+        var {!typeofConfig}SelectedData = [];//selectedTriggersData
+
+             function deleteTriggers() {	
+                 var triggerToDelete = [];
+                 debugger;
+                 if({!typeofConfig}SelectedData != null){
+                 	for(var iCount = 0;iCount < {!typeofConfig}SelectedData.length;iCount++){
+                 		if(triggerToDelete != ''){
+                    	triggerToDelete = {!typeofConfig}SelectedData[iCount].triggerID +','+ triggerToDelete;
+                        }
+                        else{
+                            triggerToDelete = {!typeofConfig}SelectedData[iCount].triggerID;
+                        }
+                    }
+                 }
+                 if(triggerToDelete != null && triggerToDelete.length > 0){ 
+    				CleanConfigurations(triggerToDelete);
+    			}
+    			else{
+    				toastr.error('No triggers selected');
+    			}
+			}
+            
+	function toggleIcon(e) {
+        j$(e.target)
+            .prev('.panel-heading')
+            .find(".more-less")
+            .toggleClass('glyphicon-plus glyphicon-minus');
+    }
+    
+            j$(document).delegate(".{!typeofConfig}Individualobject", "click", function() {
+  				 var tableRow = j$(this).closest('tr');
+                 var selectedData = {!typeofConfig}PreviewTable.row(tableRow).data();
+                 loadSelectedTriggersTable(selectedData.name,this.checked,true);
+                toastr.success(selectedData.name + ' trigger added in Selected Triggers section');
+			});
+            j$(document).delegate("#{!typeofConfig}ObjectTable .selective", "click", function() {
+                var tableRow = j$(this).closest('tr');
+                var selectedData = {!typeofConfig}ObjTable.row(tableRow).data();
+                loadChildTable(selectedData.name);
+                toastr.info(selectedData.name + ' triggers will be displayed in Triggers section');
+			});
+            j$(document).delegate("#{!typeofConfig}ObjectTable .object{!typeofConfig}", "click", function() {
+                var tableRow = j$(this).closest('tr');
+                var isSelected = this.checked;
+                var selectedData = {!typeofConfig}ObjTable.row(tableRow).data();
+                loadSelectedTriggersTable(selectedData.name,isSelected,false);
+                if(isSelected){
+                toastr.success(selectedData.name + ' triggers added in Selected Triggers section');
+                }
+			});
+           j$(document).ready(function () {
+               j$('.panel-group').on('hidden.bs.collapse', toggleIcon);
+    			j$('.panel-group').on('shown.bs.collapse', toggleIcon);
+               
+               
+            
+               {!typeofConfig}SelectedTable = j$('#{!typeofConfig}SelectedDTTable').DataTable({
+         		"paging":   false,
+        		"ordering": false,
+        		"info":     false
+      			});
+                        for (var i = 0; i < triggerJsonData.data.length; i++) {
+                            var item = triggerJsonData.data[i];
+                            if(item.parent == ''){
+                            	{!typeofConfig}ObjectData.push({
+                                	"name": item.name
+                            	}); 
+                            }
+                        }
+                 {!typeofConfig}PreviewTable = j$('#{!typeofConfig}byObjectDTTable').DataTable({ 
+        			data: {!typeofConfig}ObjectData,
+                        "oLanguage": {
+         					"sInfo": "_TOTAL_ entries",//"_START_ to _END_ of _TOTAL_ entries",
+         					"sInfoEmpty": "0 to 0 of 0 entries",
+                            "oPaginate": {
+                                //"sFirst": "First page", // This is the link to the first page
+								"sPrevious": "<", // This is the link to the previous page
+                                "sNext": ">"//, // This is the link to the next page
+                                //"sLast": "Last page" // This is the link to the last page
+							}
+      					},
+        			columns: [
+           					{ "data": "name" },
+             				{"data":   "name",'bSortable': false,
+                				render: function ( data, type, row ) {
+                    			if ( type === 'display' ) {
+                                    return '<input id="{!typeofConfig}ObjectCheck_'+row.name+'" class="object{!typeofConfig}" type="checkbox" />';
+                    			}
+                    			return data;
+                						}
+            				}
+        		]});	
+			});
+            function loadChildTable(objectName){
+                console.log(objectName);
+                {!typeofConfig}Data = [];
+                debugger;
+                        for (var i = 0; i < triggerJsonData.data.length; i++) {
+                            var item = triggerJsonData.data[i];
+                            if(item.parentName == objectName){
+                            	{!typeofConfig}Data.push({
+                                	"name": item.name,
+                                    "enbl": item.enbl,
+                                    "triggerID":item.triggerID
+                            	}); 
+                            }
+                        }
+                {!typeofConfig}PreviewTable.destroy();
+                {!typeofConfig}PreviewTable = j$('#{!typeofConfig}byObjectDTTable').DataTable( {
+                    "fnPreDrawCallback": function( oSettings ) {
+                        // alert("draw call back");
+                    },
+                    "initComplete": function(settings, json) {
+                        //alert( 'init complete.' );
+  					},
+                    "oLanguage": {
+         					"sInfo": "_TOTAL_ entries",//"_START_ to _END_ of _TOTAL_ entries",
+         					"sInfoEmpty": "0 to 0 of 0 entries",
+                        	"oPaginate": {
+								"sPrevious": "<", // This is the link to the previous page
+                                "sNext": ">"// This is the link to the next page
+							}
+      					},
+        			data: {!typeofConfig}Data,
+                    "destroy": true,
+        			columns: [{ "data": "name" },
+        					{ "data": "triggerID", "visible": false },
+                             {"data":   "enbl",'bSortable': false,
+                				render: function ( data, type, row ) {
+                    			if ( type === 'display' ) {
+                                    if(row.enbl == "1"){
+                                    	return '<input id="IndividualObject{!typeofConfig}Check_'+row.name+'" class="{!typeofConfig}Individualobject" type="checkbox" checked />';
+                                    }
+                                    else{
+                                        return '<input id="IndividualObject{!typeofConfig}Check_'+row.name+'" class="{!typeofConfig}Individualobject" type="checkbox" />';
+                                    }
+                    			}
+                    			return data;
+                						}
+            				}, 
+                             ]});	
+                              
+            }
+            function loadSelectedTriggersTable(objectName,isSelected,isChild){
+                console.log(objectName);
+                 {!typeofConfig}SelectedData = [];
+                        for (var i = 0; i < triggerJsonData.data.length; i++) {
+                            var item = triggerJsonData.data[i];
+                            if(item.name == objectName && isChild){
+                    			item.enbl = isSelected ? '1' : '0';
+                            }	
+                            if(item.parentName == objectName || item.enbl == '1' || (isChild && item.name == objectName)){
+                                 if(item.parentName == objectName){
+                            		item.enbl = isSelected ? '1' : '0';
+                                }
+                                //item.enbl = '1';
+                                if(item.enbl == '1'){
+                                    //if(item.name != objectName)
+                                    // {
+                            		{!typeofConfig}SelectedData.push({
+                                		"name": item.name,
+                                		"triggerID":item.triggerID
+                            		}); 
+                                    // }
+                                }
+                            }
+                        }
+                {!typeofConfig}SelectedTable.destroy();
+                {!typeofConfig}SelectedTable = j$('#{!typeofConfig}SelectedDTTable').DataTable( {
+        			data: {!typeofConfig}SelectedData,
+                    "oLanguage": {
+                        "sInfo": "_TOTAL_ entries",//"_START_ to _END_ of _TOTAL_ entries",
+         					"sInfoEmpty": "0 to 0 of 0 entries",
+                        	"oPaginate": {
+								"sPrevious": "<", // This is the link to the previous page
+                                "sNext": ">"// This is the link to the next page
+							}
+      					},
+        			columns: [{ "data": "name" },{ "data": "triggerID", "visible": false }]});	
+                  
+            }
+         	function CleanConfigurationsCompleted(){
+         	toastr.success('Batch is initiated. Email notification will be sent to you soon.');
+         	}
+		</script>
+	</head>
+	<body>
+      
+  
+         <div class="row">
+  			<div class="col-md-4">
+                 <h3>
+                   <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Triggers 
+                </h3>
+    			<table id="{!typeofConfig}byObjectDTTable" class="display" width="100%"><!--triggersbyObjectDTTable-->
+        		<thead>
+            		<tr>
+                		<th>Name</th>
+                		<th></th>
+                        <th></th>
+            		</tr>
+        		</thead>
+        		<tfoot>
+            		<tr>
+                		<th>Name</th>
+                		<th></th>
+                        <th></th>
+            		</tr>
+        		</tfoot>
+        		</table>	
+            </div>   
+  			<div class="col-md-4">
+                 <h3>
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Selected Triggers 
+                </h3>
+    			<table id="{!typeofConfig}SelectedDTTable" class="display" width="100%"><!--selectedTriggersDTTable-->
+        		<thead>
+            		<tr>
+                		<th>Name</th>
+                		<th></th>
+            		</tr>
+        		</thead>
+        		<tfoot>
+            		<tr>
+                		<th>Name</th>
+                		<th></th>
+            		</tr>
+        		</tfoot>
+        		</table>
+            </div>
+             <div class="col-md-4"></div>
+		</div>
+				<div class="btn-group" style="float:right;">
+  <p><apex:outputText value="" id="view" /></p>
+        <apex:actionFunction name="CleanConfigurations" action="{!CleanConfigurations}" rerender="view" oncomplete="CleanConfigurationsCompleted();">     
+     		<apex:param id="triggers" name="selectedTriggers"  assignTo="{!selectedTriggers}" value="" />
+ 		</apex:actionFunction>
+        <apex:commandLink onclick="deleteTriggers();return false;" >               
+       		<apex:commandButton value="Proceed" styleClass="btn btn-default" />
+        </apex:commandLink>
+</div>
+      
+	</body>
+	</apex:form>
+</apex:component>

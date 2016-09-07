@@ -1,0 +1,55 @@
+<apex:page controller="CustomDataCleanUpService" showHeader="false" sidebar="false"> 
+ 
+    <apex:includescript value="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"/>
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"/>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"/>
+    <script>
+     $j = jQuery.noConflict();
+     $j(document).ready(function(){
+     	$j('#popUp').dialog({autoOpen:false,model:true,position:'center',width: 1000});
+     
+     });
+    function showDialog(depenList)
+    {
+        $j("#dependentObj").html(<p>depenList</p>);
+        $j("#popUp").dialog("open");
+        $j('#popUp').dialog("option","title","Dependent Object List","width",700,"height",700);
+        $j('#popUp').dialog('option','position','center');
+        return false;
+        
+        
+    }
+    </script>
+    <apex:form >
+        <apex:pageMessages />
+        <apex:actionFunction action="{!checkAll}" name="check" reRender="table" />
+        <apex:pageBlock title="Custom Data Clean Up" >
+            <apex:pageBlockSection id="pageId" title="Custom Objects" columns="4">
+                <apex:pageBlockTable value="{!wrapObjList}" var="wObj"  id="table" align="center" title="Custom Objects" styleClass="table">
+                    <apex:column >
+                        <apex:facet name="header" ><apex:inputCheckbox onclick="check()" value="{!flag}"/>  </apex:facet>
+                        <apex:inputCheckbox value="{!wObj.isSelected}" id="InputId" label="Object Name"/> 
+                    </apex:column>
+                    <apex:column > 
+                        <apex:facet name="header" >Object Name</apex:facet> 
+                        {!wObj.objName} 
+                    </apex:column>
+                    <apex:column > 
+                        <apex:facet name="header" >Number of Records</apex:facet> 
+                        {!wObj.count} 
+                    </apex:column>
+                </apex:pageBlockTable>     
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Delete"  action="{!deleteRecords}"  reRender="pageId"  oncomplete="return showDialog('{!dependentObjList}')"/>
+                <apex:commandButton action="{!cancleDelete}" value="Cancle"/>&nbsp;&nbsp;&nbsp;&nbsp;
+               
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        <div id ="popUp">
+            <div style = "float:left" >These object's records are also get deleted</div>
+            <div id = "dependentObj"></div>
+        </div>
+        <!-- <apex:actionStatus id="counterStatus" startText=" (incrementing...)" stopText=" (done)"/> -->
+    </apex:form>   
+</apex:page>

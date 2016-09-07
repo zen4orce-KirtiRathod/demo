@@ -1,0 +1,10 @@
+<apex:page standardController="test6__c">
+    <apex:form >
+    <apex:pageBlock >
+    	<apex:inputField value="{!test6__c.FirstName__c}"/>
+        <apex:inputField value="{!test6__c.test7__c}"/>
+    
+    <apex:commandButton action="{!Save}" value="Save"/>
+        </apex:pageBlock>
+        </apex:form>
+</apex:page>

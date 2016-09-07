@@ -1,0 +1,34 @@
+<apex:page Controller="FieldDeleteService" showHeader="false" >
+    <apex:form >
+        <apex:pageBlock >
+        <apex:pageBlockSection title="All Objects" columns="3">
+          <apex:pageBlockTable value="{!objList}" var="obj">
+           <apex:column >
+                <apex:facet name="header" >All Objects </apex:facet> 
+            	{!obj}
+               <apex:actionSupport event="onclick" rerender="allFieldSection"/>
+             </apex:column>
+             <apex:column >
+                <apex:facet name="header" >All Fields</apex:facet> 
+                <apex:commandLink value="All Fields" action="{!fieldFlag}" reRender="allFieldSection" />
+                 <apex:param name="objCount" value="{!obj}" id="RecordsCount" assignTo="{!objField}"/>
+            </apex:column>
+          </apex:pageBlockTable> 
+        </apex:pageBlockSection> 
+       <apex:pageBlockSection title="Object Fields" columns="2" rendered="{IF(iFlag)}" id="allFieldSection">
+           <apex:pageBlockTable value="{!wrapFieldList}" var="fields"  >
+           	<apex:column >
+                <apex:facet name="header" ><apex:inputCheckbox onclick="flagField()" ></apex:inputCheckbox></apex:facet>
+                <apex:inputCheckbox value="{!fields.isSelected}" id="InputId" label="Field Name"/> 
+            </apex:column>
+            <apex:column > 
+                <apex:facet name="header" >Field Name</apex:facet> 
+                {!fields.objName} 
+           </apex:column>
+          </apex:pageBlockTable>
+       </apex:pageBlockSection>
+            
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>
